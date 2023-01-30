@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block main %}
+<h1 style="text-align: center; color: aliceblue;">RECENT TODOS</h1>
+<br>
+<div class="page">
+   {% for i in range(len) %}
+   <article>
+       <h2 class="h2">{{todos[0]["todos"][i]["title"]}}</h2>
+       <h5 class="h3">{{todos[0]["todos"][i]["date"]}}</h5>
+       <p class="h4">{{todos[0]["todos"][i]["todo"]}}</p>
+       <hr>
+   </article>
+   {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container">
+    <h1 class="h1">Create Account</h1>
+    <form action="/createaccount" method="post">
+        <label for="fname">Username</label>
+        <p><input type="text" name="username"></p>
+        <label for="passw">Password</label>
+        <p><input type="password" name="pass"></p>
+        <label for="passw">Retype Password</label>
+        <p><input type="password" name="pass2"></p>
+        <p><input type="submit" value="Create Account" style="font-weight: 600;" id="btn" class="button"></p>
+    </form>
+    <h5 class="h1">{{message}}</h5>
+</div>
+{% endblock %}
