@@ -76,15 +76,12 @@ def get_data():
 def create():
     if request.method == "POST":
         try:
-            global name
-            global passw 
-            global date 
-            global email
             name = request.form["username"]
             passw = request.form["pass"]
             passw2 = request.form["pass2"]
             email = request.form["email"]
             date = f"{datetime.utcnow().date()}"
+
             dbResponse = list(db.todos.find({"username": name}))
             dbResponse2 = list(db.todos.find({"email": email}))
             if passw == passw2:
@@ -93,6 +90,10 @@ def create():
                 if len(dbResponse2) > 0:
                     return render_template("create.html", message="Email already in use")
                 else:
+                    session["name"] = name
+                    session["pass"] = passw
+                    session["email"] = email
+                    session["date"] = date
                     return send_otp(email, reason="create")
             else:
                 return render_template("create.html", message="Passwords didn't matched")
@@ -205,10 +206,10 @@ def reset_password():
 
 @app.route("/create", methods=["POST"])
 def verifying():
-    global name
-    global passw 
-    global date 
-    global email
+    name = session["name"]
+    passw = session["pass"]
+    email = session["email"]
+    date = session["date"]
     if f"{session['otps']}" == f"{request.form['otp']}":
         hashed = sha256_crypt.hash(passw)
         json_data = {
@@ -220,6 +221,10 @@ def verifying():
         }
         dbResponse = db.todos.insert_one(json_data)
         session.pop("otps", None)
+        session.pop("name", None)
+        session.pop("pass", None)
+        session.pop("email", None)
+        session.pop("date", None)
         return render_template("login.html", message="Account created successfully, Login now")
     elif f'{session["otps"]}' != f"{request.form['otp']}":
         return render_template("otp.html", message="Wrong OTP")
