@@ -157,8 +157,8 @@ def delete_todo():
 def send_otp(email=None, reason="reset"):
     if request.method == "POST":
         if reason == "create":
-            global otp
             otp = random.randint(100000, 999999)
+            session["otps"] = otp
             msg = Message("Welcome to Flask Todo", sender="Flask Todo", recipients=[email])
             msg.body = f"YOUR OTP: {otp}"
             mail.send(msg)
@@ -168,8 +168,8 @@ def send_otp(email=None, reason="reset"):
             session["email"] = email
             dbResponse = list(db.todos.find({"email": email}))
             if len(dbResponse) > 0:
-                global otp2
                 otp2 = random.randint(100000, 999999)
+                session["otpr"] = otp2
                 msg = Message("Welcome to Flask Todo", sender="Flask Todo", recipients=[email])
                 msg.body = f"YOUR PASSWORD RESET OTP: {otp2}"
                 mail.send(msg)
@@ -180,10 +180,9 @@ def send_otp(email=None, reason="reset"):
 
 @app.route("/reset_verify", methods=["POST"])
 def reset_verify():
-    global otp2
-    if f"{otp2}" == f"{request.form['otp']}":
+    if f"{session['otpr']}" == f"{request.form['otp']}":
         return render_template("setpass.html", message="")
-    elif f'{otp2}' != f"{request.form['otp']}":
+    elif f"{session['otpr']}" != f"{request.form['otp']}":
         return render_template("reset.html", message="Wrong OTP")
 
 
@@ -197,6 +196,7 @@ def reset_password():
             email = session["email"]
             dbUpdate = db.todos.update_one({"email": email}, {"$set": {"password": hashed}})
             session.pop("email", None)
+            session.pop("otpr", None)
             return render_template("login.html", message="Password reset successful, Login now")
         else:
             return render_template("setpass.html", message="Invalid Method, try again")
@@ -205,12 +205,11 @@ def reset_password():
 
 @app.route("/create", methods=["POST"])
 def verifying():
-    global otp
     global name
     global passw 
     global date 
     global email
-    if f"{otp}" == f"{request.form['otp']}":
+    if f"{session['otps']}" == f"{request.form['otp']}":
         hashed = sha256_crypt.hash(passw)
         json_data = {
             "username": name,
@@ -220,8 +219,9 @@ def verifying():
             "todos": []
         }
         dbResponse = db.todos.insert_one(json_data)
+        session.pop("otps", None)
         return render_template("login.html", message="Account created successfully, Login now")
-    elif f'{otp}' != f"{request.form['otp']}":
+    elif f'{session["otps"]}' != f"{request.form['otp']}":
         return render_template("otp.html", message="Wrong OTP")
 
 
@@ -231,4 +231,4 @@ def forgot():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0")
