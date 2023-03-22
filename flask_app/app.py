@@ -11,8 +11,8 @@ app = Flask(__name__)
 app.secret_key = "akgjbuoiegbawuogb"
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 587
-app.config["MAIL_USERNAME"] = "flasktodoapp@gmail.com"
-app.config["MAIL_PASSWORD"] = "kokmkaquqadyrcdj"
+app.config["MAIL_USERNAME"] = "xxxxxxxxx@gmail.com"
+app.config["MAIL_PASSWORD"] = "xxxxxxxxxxxx"
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
@@ -22,7 +22,7 @@ mail = Mail(app)
 
 
 try:
-    mongo = f"mongodb+srv://piyush:e2ZQbOapSM3Xfpuc@flask.xmudilt.mongodb.net/?retryWrites=true&w=majority"
+    mongo = f"xxxxxxxxxxxxxxxxx"
     cluster = MongoClient(mongo)
     db = cluster.todos
 except:
