@@ -16,9 +16,6 @@ app.config["MAIL_PASSWORD"] = "xxxxxxxxxxxx"
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
-# app.config['RECAPTCHA_SITE_KEY'] = '6LeXZVckAAAAABuQYPYqDI-VUdg33gZ-Dojt4_np'
-# app.config['RECAPTCHA_SECRET_KEY'] = '6LeXZVckAAAAAHIcPPEtzGFxyK3RBchwMpN6hH8q'
-# recaptcha = ReCaptcha(app) 
 
 
 try:
