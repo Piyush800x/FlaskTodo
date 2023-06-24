@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container">
+    <form action="/reset_verify" method="post">
+        <label for="otp">OTP</label>
+        <p><input type="text" name="otp"></p>
+        <p><input type="submit" value="Submit" id="btn" style="font-weight: 600;" class="button"></p>
+    </form>
+    <p>{{message}}</p>
+</div>
+{% endblock %}
