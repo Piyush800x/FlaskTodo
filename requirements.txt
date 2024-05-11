@@ -1,5 +1,13 @@
-pymongo==4.3.3
-flask==2.2.2
+blinker==1.8.2
+click==8.1.7
+colorama==0.4.6
 dnspython==2.3.0
-passlib==1.7.4
+Flask==2.2.2
+Flask-Mail==0.9.1
 gunicorn==20.1.0
+itsdangerous==2.2.0
+Jinja2==3.1.4
+MarkupSafe==2.1.5
+passlib==1.7.4
+pymongo==4.3.3
+Werkzeug==2.2.2

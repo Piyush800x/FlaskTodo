@@ -2,17 +2,18 @@ from flask import Flask, render_template, request, Response, flash, session, red
 from flask_mail import Mail, Message
 import random
 from datetime import datetime
-from pymongo import MongoClient
+from pymongo.mongo_client import MongoClient
 import json
 from bson import ObjectId
 from passlib.hash import sha256_crypt
+import os
 
 app = Flask(__name__)
 app.secret_key = "akgjbuoiegbawuogb"
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 587
-app.config["MAIL_USERNAME"] = "xxxxxxxxx@gmail.com"
-app.config["MAIL_PASSWORD"] = "xxxxxxxxxxxx"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
@@ -38,17 +39,18 @@ def create_todo():
         desc = request.form["todo"]
         date = f"{datetime.utcnow().date()}"
         json_data = {
-            "title": name, 
+            "title": name,
             "todo": desc,
             "date": date
         }
         try:
             if "_id" in session:
                 _id = session["_id"]
-                dbResponse = db.todos.update_one({"_id": ObjectId(f"{_id}")}, {"$push": {"todos": json_data}})  
+                dbResponse = db.todos.update_one({"_id": ObjectId(f"{_id}")}, {
+                                                 "$push": {"todos": json_data}})
             else:
                 return render_template("login.html", msg="Login to create your todos", message="")
-        except Exception as e:    
+        except Exception as e:
             return render_template("login.html", msg="Login to create todos.")
         return render_template("index.html", message="Todo created successfully")
     except Exception as e:
@@ -68,7 +70,7 @@ def get_data():
         except Exception as e:
             return render_template("login.html", msg="Login to see your todos", message="")
 
-    
+
 @app.route("/createaccount", methods=["GET", "POST"])
 def create():
     if request.method == "POST":
@@ -96,7 +98,7 @@ def create():
                 return render_template("create.html", message="Passwords didn't matched")
         except Exception as e:
             return Response(response=json.dumps({
-                    "message": "unknown error occured"
+                "message": "unknown error occured"
             }), status=300)
     if request.method == "GET":
         return render_template("create.html", message="")
@@ -137,13 +139,14 @@ def delete_todo():
             todos = list(db.todos.find({"_id": ObjectId(f"{_id}")}))
             for i, todo in enumerate(todos[0]["todos"]):
                 if todo["title"] == title:
-                    dbRemove = db.todos.update_one({"_id": ObjectId(f"{_id}")}, {"$pull": {"todos": {"title": title}}})
+                    dbRemove = db.todos.update_one({"_id": ObjectId(f"{_id}")}, {
+                                                   "$pull": {"todos": {"title": title}}})
                     return render_template("delete.html", message=f"{title} deleted")
                 else:
                     continue
             else:
                 return render_template("delete.html", message="Can't find your todo")
-            
+
         else:
             return render_template("login.html", msg="Login to delete your todos", message="")
 
@@ -157,7 +160,8 @@ def send_otp(email=None, reason="reset"):
         if reason == "create":
             otp = random.randint(100000, 999999)
             session["otps"] = otp
-            msg = Message("Welcome to Flask Todo", sender="Flask Todo", recipients=[email])
+            msg = Message("Welcome to Flask Todo",
+                          sender="Flask Todo", recipients=[email])
             msg.body = f"YOUR OTP: {otp}"
             mail.send(msg)
             return render_template("otp.html")
@@ -168,11 +172,12 @@ def send_otp(email=None, reason="reset"):
             if len(dbResponse) > 0:
                 otp2 = random.randint(100000, 999999)
                 session["otpr"] = otp2
-                msg = Message("Welcome to Flask Todo", sender="Flask Todo", recipients=[email])
+                msg = Message("Welcome to Flask Todo",
+                              sender="Flask Todo", recipients=[email])
                 msg.body = f"YOUR PASSWORD RESET OTP: {otp2}"
                 mail.send(msg)
                 return render_template("reset.html")
-            elif len(dbResponse) == 0:  
+            elif len(dbResponse) == 0:
                 return render_template("reset.html", message="Email not found")
 
 
@@ -192,7 +197,8 @@ def reset_password():
         hashed = sha256_crypt.hash(passw1)
         if "email" in session:
             email = session["email"]
-            dbUpdate = db.todos.update_one({"email": email}, {"$set": {"password": hashed}})
+            dbUpdate = db.todos.update_one(
+                {"email": email}, {"$set": {"password": hashed}})
             session.pop("email", None)
             session.pop("otpr", None)
             return render_template("login.html", message="Password reset successful, Login now")
@@ -200,6 +206,7 @@ def reset_password():
             return render_template("setpass.html", message="Invalid Method, try again")
     else:
         return render_template("setpass.html", message="Passwords didn't matched, try again")
+
 
 @app.route("/create", methods=["POST"])
 def verifying():
@@ -212,7 +219,7 @@ def verifying():
         json_data = {
             "username": name,
             "password": hashed,
-            "date": date, 
+            "date": date,
             "email": email,
             "todos": []
         }
@@ -233,4 +240,4 @@ def forgot():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", debug=False)
