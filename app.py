@@ -20,7 +20,7 @@ mail = Mail(app)
 
 
 try:
-    mongo = f"xxxxxxxxxxxxxxxxx"
+    mongo = os.getenv("MONGODB_URI")
     cluster = MongoClient(mongo)
     db = cluster.todos
 except:
@@ -174,7 +174,8 @@ def send_otp(email=None, reason="reset"):
                 session["otpr"] = otp2
                 msg = Message("Welcome to Flask Todo",
                               sender="Flask Todo", recipients=[email])
-                msg.body = f"YOUR PASSWORD RESET OTP: {otp2}"
+                # msg.body = f"YOUR PASSWORD RESET OTP: {otp2}"
+                msg.html = render_template('email.html', message={otp2})
                 mail.send(msg)
                 return render_template("reset.html")
             elif len(dbResponse) == 0:
